@@ -22,7 +22,7 @@ jobs:
       - name: Build Docker Image
         working-directory: ./api
         run: /
-          docker build -t whizwhuz/meetup-backend
+          docker build -t whizwhuz/meetup-backend .
 
       - name: Push Docker Image
         run: /
