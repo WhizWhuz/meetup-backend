@@ -1,5 +1,5 @@
 {
-  "name": "prototype",
+  "name": "Meetup API",
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
@@ -16,8 +16,7 @@
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "mongodb": "^6.20.0",
-    "mongoose": "^8.19.2",
-    "yamljs": "^0.3.0"
+    "mongoose": "^8.19.2"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"
