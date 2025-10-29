@@ -67,7 +67,7 @@ const searchMeetups = async (req, res) => {
 const getMeetupDetails = async (req, res) => {
   try {
     const { meetupId } = req.params;
-    console.log(`getMeetupDetails: id=${meetupId} requested by user=${req.user?.userId || 'anon'}`);
+    console.log(`........getMeetupDetails: id=${meetupId} requested by user=${req.user?.userId || 'anon'}`);
 
     const meetup = await Meetup.findById(meetupId);
     if (!meetup) return res.status(404).json({ error: 'Meetup not found' });
