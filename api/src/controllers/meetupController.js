@@ -7,7 +7,6 @@ const createMeetup = async (req, res) => {
   try {
     const { title, date, location, description, capacity } = req.body;
 
-    // kräver auth
     if (!req.user?.id && !req.user?.userId) {
       return res.status(401).json({ error: "Unauthorized" });
     }
@@ -16,15 +15,15 @@ const createMeetup = async (req, res) => {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
-    const hostId = req.user.id || req.user.userId; // ObjectId som string
+    const hostId = req.user.id || req.user.userId;
 
     const meetup = new Meetup({
       title,
-      date, // ISO string funkar; Mongoose castar till Date
+      date,
       location,
       description,
-      host: hostId, // <-- ObjectId, inte name
-      capacity: Number(capacity), // säkerställ nummer
+      host: hostId,
+      capacity: Number(capacity),
       registeredUsers: [],
     });
 
@@ -33,7 +32,6 @@ const createMeetup = async (req, res) => {
   } catch (err) {
     console.error("createMeetup error:", err);
 
-    // Gör valideringsfel till 400, inte 500
     if (err.name === "ValidationError" || err.name === "CastError") {
       return res.status(400).json({ error: err.message });
     }
