@@ -2,7 +2,6 @@ const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
-// Registera användare
 exports.register = async (req, res) => {
   const { email, password, name } = req.body;
 
@@ -53,7 +52,6 @@ exports.register = async (req, res) => {
   }
 };
 
-// Login
 exports.login = async (req, res) => {
   const { email, password } = req.body;
 
@@ -85,19 +83,5 @@ exports.login = async (req, res) => {
     res
       .status(500)
       .json({ message: "Inloggning misslyckades!", error: err.message });
-  }
-};
-
-// Hämta en användare
-exports.getCurrentUser = async (req, res) => {
-  try {
-    const user = await User.findById(req.user.id).select("name email");
-    if (!user) return res.status(404).json({ message: "Användare ej funnen" });
-
-    res.status(200).json({ user });
-  } catch (err) {
-    res
-      .status(500)
-      .json({ message: "Gick ej att hämmta annvändare", error: err.message });
   }
 };
