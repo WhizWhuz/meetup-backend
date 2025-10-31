@@ -1,0 +1,141 @@
+{
+  "info": {
+    "name": "Meetup App API",
+    "_postman_id": "fibonachos-meetup-api-collection",
+    "description": "Postman collection för Meetup Fullstack App (backend på localhost:5000)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth - Register User",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Alice\",\n  \"email\": \"alice@example.com\",\n  \"password\": \"Password123\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:5000/api/auth/register",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "auth", "register"]
+        }
+      }
+    },
+    {
+      "name": "Auth - Login User",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"alice@example.com\",\n  \"password\": \"Password123\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:5000/api/auth/login",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "auth", "login"]
+        }
+      }
+    },
+    {
+      "name": "Meetups - Get All Meetups",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "http://localhost:5000/api/meetups",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "meetups"]
+        }
+      }
+    },
+    {
+      "name": "Meetups - Search Meetups",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "http://localhost:5000/api/meetups/search?keyword=React",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "meetups", "search"],
+          "query": [{ "key": "keyword", "value": "React" }]
+        }
+      }
+    },
+    {
+      "name": "Meetups - Create Meetup",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"React Meetup\",\n  \"date\": \"2025-12-01T18:00:00.000Z\",\n  \"location\": \"Stockholm, Zocom HQ\",\n  \"description\": \"Lär dig React och häng med andra devs!\",\n  \"capacity\": 30\n}"
+        },
+        "url": {
+          "raw": "http://localhost:5000/api/meetups",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "meetups"]
+        }
+      }
+    },
+    {
+      "name": "Meetups - Get Meetup Details",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "http://localhost:5000/api/meetups/:meetupId",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "meetups", ":meetupId"]
+        }
+      }
+    },
+    {
+      "name": "Meetups - Register for Meetup",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": {
+          "raw": "http://localhost:5000/api/meetups/:meetupId/register",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "meetups", ":meetupId", "register"]
+        }
+      }
+    },
+    {
+      "name": "Meetups - Unregister from Meetup",
+      "request": {
+        "method": "DELETE",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": {
+          "raw": "http://localhost:5000/api/meetups/:meetupId/unregister",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "meetups", ":meetupId", "unregister"]
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "token",
+      "value": ""
+    }
+  ]
+}

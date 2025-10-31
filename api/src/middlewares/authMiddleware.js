@@ -2,27 +2,34 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
 module.exports = async (req, res, next) => {
-  const authHeader = req.headers.authorization;
+  const header = req.headers.authorization || "";
+  const [scheme, token] = header.split(" ");
 
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+  if (scheme?.toLowerCase() !== "bearer" || !token) {
     return res
       .status(401)
       .json({ message: "Åtkomst nekad. Finns ingen token" });
   }
 
-  const token = authHeader.split(" ")[1];
+  const secret = process.env.JWT_SECRET || process.env.JWT_SECRET_KEY;
+  if (!secret)
+    return res.status(500).json({ message: "Servern saknar JWT-secret" });
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.id);
-
-    if (!user) {
+    const decoded = jwt.verify(token, secret);
+    const user = await User.findById(decoded.id).select("_id name role").lean();
+    if (!user)
       return res.status(401).json({ message: "Användaren hittades ej." });
-    }
 
-    req.user = { id: user._id };
+    req.user = {
+      id: String(user._id),
+      userId: String(user._id),
+      name: user.name || "Anonymous",
+      role: user.role || "user",
+    };
+
     next();
-  } catch (err) {
-    return res.status(403).json({ message: "Felaktig eller ogiltlig token" });
+  } catch {
+    return res.status(401).json({ message: "Felaktig eller ogiltlig token" });
   }
 };
