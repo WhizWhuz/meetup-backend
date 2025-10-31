@@ -6,6 +6,15 @@ on:
       - main
 
 jobs:
+  check-branch:
+      runs-on: ubuntu-latest
+      steps:
+        - name: Ensure merge comes from dev branch
+          if: github.event.pull_request.base.ref == 'main' && github.event.pull_request.head.ref != 'dev'
+          run: |
+              echo "Only merges from 'dev' branch are allowed to main!"
+              exit 1
+              
   deploy:
     runs-on: ubuntu-latest
 
