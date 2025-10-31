@@ -1,27 +1,40 @@
 const mongoose = require("mongoose");
 
-const meetupSchema = new Mongoose.Schema({
-  title: {
-    type: String,
-    required: true,
+const meetupSchema = new mongoose.Schema(
+  {
+    title: {
+      type: String,
+      required: true,
+    },
+    date: {
+      type: Date,
+      required: true,
+    },
+    location: {
+      type: String,
+      required: true,
+    },
+    description: {
+      type: String,
+      required: true,
+    },
+    host: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    capacity: {
+      type: Number,
+      required: true,
+    },
+    registeredUsers: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
   },
-  time: {
-    type: Number,
-    required: true,
-  },
-  location: {
-    type: String,
-    required: true,
-  },
-  description: {
-    type: String,
-    required: true,
-  },
-  host: {
-    type: mongoose.Schema.ObjectId,
-    ref: "User",
-    required: true,
-  },
-});
+  { versionKey: false }
+);
 
 module.exports = mongoose.model("Meetup", meetupSchema);
