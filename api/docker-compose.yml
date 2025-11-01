@@ -1,0 +1,28 @@
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: meetup-mongodb
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongodb_data:/data/db
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: meetup-api
+    ports:
+      - "5001:5000"
+    environment:
+      MONGO_URI: mongodb://mongodb:27017/meetupdb
+      PORT: 5000
+      JWT_SECRET: c9HO7VZdrXgS2t0UhiZC/ajidelix59ta3r8dKzZtpk=
+    depends_on:
+      - mongodb
+    volumes:
+      - ./src:/app/src
+
+volumes:
+  mongodb_data:
+
