@@ -62,14 +62,15 @@ async function main() {
       date: "2025-11-15T09:00:00.000Z",
       location: "Göteborg",
       description:
-        "Vi träffas vid Stora Delsjön. Banan är främst på grusvägar, med mindre stigar runt Stora Delsjön än runt Lilla Delsjön. Vi vandrar till Lilla Delsjön och tar en paus och vilar benen vid Kaffestugan Lyckan och Bertilssons stuga.",
+        "Vi träffas vid Stora Delsjön. Banan är främst på grusvägar, med mindre stigar runt Stora Delsjön än runt Lilla Delsjön. Vi vandrar till Lilla Delsjön och tar en paus och vilar benen vid Kaffestugan Lyckan och Bertilssons stuga. Ta gärna med vattenflaska, mellanmål och kläder efter väder så att du håller dig bekväm under hela turen.",
       capacity: 25,
     },
     {
       title: "Språkutbyte",
       date: "2025-10-20T17:30:00.000Z",
       location: "Stockholm",
-      description: "En meetup för alla som vill lära sig nya språk.",
+      description:
+        "En meetup för alla som vill lära sig nya språk i en avslappnad miljö. Vi börjar med en kort introduktionsrunda där alla berättar vilka språk de vill öva på, och därefter delar vi in oss i mindre grupper. Fokus ligger på enkla samtalsövningar, vardagsfraser och att våga prata, oavsett nivå. Ta gärna med anteckningsbok och ett öppet sinne för nya kulturer.",
       capacity: 20,
     },
     {
@@ -77,28 +78,31 @@ async function main() {
       date: "2025-08-12T18:00:00.000Z",
       location: "Stockholm",
       description:
-        "Vi går runt fina fotoställen i stan och hjälper varandra att bli bättre.",
+        "Vi går runt fina fotoställen i stan och hjälper varandra att bli bättre. Kvällen börjar med en kort genomgång av grundläggande fototeknik som komposition, ljus och perspektiv, och sedan går vi ut tillsammans för att testa i praktiken. Du kan använda mobilkamera eller systemkamera, allt funkar. I slutet samlas vi igen, visar några av våra favoritbilder och delar tips och erfarenheter.",
       capacity: 15,
     },
     {
       title: "Träning",
       date: "2025-07-05T10:00:00.000Z",
       location: "Malmö",
-      description: "En meetup där vi delar med oss av våra träningstips.",
+      description:
+        "En meetup där vi delar med oss av våra träningstips och peppar varandra. Vi börjar med en gemensam uppvärmning och går sedan igenom några enkla övningar som kan anpassas efter nivå, både styrka och kondition. Fokus ligger på gemenskap snarare än prestation, så alla kan vara med oavsett tidigare erfarenhet. Ta med vattenflaska, bekväma träningskläder och gärna en yogamatta om du har.",
       capacity: 20,
     },
     {
       title: "Brädspel",
       date: "2025-09-01T16:00:00.000Z",
       location: "Uppsala",
-      description: "En meetup för brädspels-entusiaster.",
+      description:
+        "En meetup för brädspels-entusiaster i alla åldrar. Vi samlas runt ett par bord, går igenom vilka spel som finns på plats och delar upp oss efter intresse och svårighetsgrad. Det kommer att finnas både lättsamma partyspel och lite mer strategiska utmaningar, och du får gärna ta med egna favoriter. Fokus är på att ha kul, lära känna nya människor och upptäcka spel du kanske aldrig provat tidigare.",
       capacity: 12,
     },
     {
       title: "Löpning",
       date: "2025-06-14T08:30:00.000Z",
       location: "Göteborg",
-      description: "Gemensam distansrunda i lugnt tempo. Alla nivåer välkomna.",
+      description:
+        "Gemensam distansrunda i lugnt tempo där alla nivåer är välkomna. Vi startar med en kort genomgång av dagens rutt och en lätt uppvärmning innan vi springer iväg tillsammans. Tempot anpassas så att gruppen kan hålla ihop, och vi lägger in korta gångpauser vid behov. Målet är att få en skön tur, kunna prata under tiden och kanske få med sig några tips om teknik, andning och återhämtning.",
       capacity: 30,
     },
     {
@@ -106,14 +110,15 @@ async function main() {
       date: "2025-10-05T15:00:00.000Z",
       location: "Stockholm",
       description:
-        "Vi lagar vegetarisk street food tillsammans och byter recept.",
+        "Vi lagar vegetarisk street food tillsammans och byter recept och idéer. Träffen inleds med att vi går igenom dagens rätter och fördelar uppgifterna i gruppen, så att alla får vara med i köket oavsett tidigare erfarenhet. Under tiden pratar vi om kryddor, smaksättning och hur man kan göra rätterna både enkla och vardagsvänliga. I slutet dukar vi upp en gemensam buffé och provar allt vi har lagat tillsammans.",
       capacity: 16,
     },
     {
       title: "Bokcirkel",
       date: "2025-09-22T18:30:00.000Z",
       location: "Umeå",
-      description: "Vi diskuterar månadens bok över fika.",
+      description:
+        "Vi diskuterar månadens bok över fika i en varm och avslappnad miljö. Träffen börjar med en kort runda där alla får dela sina spontana intryck, och sedan går vi djupare in på teman, karaktärer och favoritcitat. Det är helt okej att komma även om du inte hunnit läsa klart, men meddela gärna i början så slipper vi spoila alltför mycket. Ta gärna med egna läsförslag till framtida träffar.",
       capacity: 14,
     },
     {
@@ -121,14 +126,15 @@ async function main() {
       date: "2025-08-28T17:00:00.000Z",
       location: "Stockholm",
       description:
-        "Bygg små side projects i grupp, dela idéer och demo i slutet.",
+        "Bygg små side projects i grupp, dela idéer och demo i slutet av kvällen. Vi börjar med en kort presentationsrunda där alla berättar vad de vill jobba på eller lära sig mer om, och därefter hittar vi naturliga team. Du kan koda själv, para-programmera eller bara sitta bredvid och lära dig. Det finns plats för både nybörjare och mer erfarna utvecklare, och fokus ligger på att leka, testa och inspirera varandra.",
       capacity: 25,
     },
     {
       title: "Yoga i Parken",
       date: "2025-06-21T09:30:00.000Z",
       location: "Lund",
-      description: "Mjukt vinyasa-pass utomhus. Ta med egen matta/handduk.",
+      description:
+        "Mjukt vinyasa-pass utomhus där vi fokuserar på andning, närvaro och rörelseglädje. Klassen passar både dig som är nybörjare och dig som yogat tidigare, och instruktören ger alternativ för olika nivåer. Vi börjar med lugna uppvärmningsövningar, går vidare till enkla flöden och avslutar med en längre avslappning i savasana. Ta med egen matta eller handduk, en vattenflaska och gärna en extra tröja om det blåser.",
       capacity: 20,
     },
   ];

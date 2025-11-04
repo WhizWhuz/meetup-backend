@@ -20,12 +20,24 @@ const API_URL = "https://meetup-backend-latest-pdua.onrender.com";
 `${API_URL}/api/auth/login`;
 ```
 
+**GET** - Profilsida (*auth*)
+
+```javascript
+`${API_URL}/api/auth/profile`;
+```
+
 ## Meetups
 
 **GET** - Visa alla Meetups
 
 ```javascript
 `${API_URL}/api/meetups`;
+```
+
+**GET** - Visa dina Meetups (*auth*)
+
+```javascript
+`${API_URL}/api/meetups/my-meetups`;
 ```
 
 **GET** - Sök möte via ord
