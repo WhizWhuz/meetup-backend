@@ -1,8 +1,6 @@
 const Meetup = require("../models/Meetup");
 const User = require("../models/User");
 
-// TODO: create/list/search meetups; show details; register/unregister users.
-
 const createMeetup = async (req, res) => {
   try {
     const { title, date, location, description, capacity } = req.body;
@@ -43,9 +41,13 @@ const createMeetup = async (req, res) => {
 const getAllMeetups = async (req, res) => {
   try {
     console.log(`getAllMeetups request by user=${req.user?.userId || "anon"}`);
-    const meetups = await Meetup.find({ date: { $gte: new Date() } })
+
+    const meetups = await Meetup.find()
       .sort({ date: 1 })
-      .select("title date location description host capacity registeredUsers");
+      .select("title date location description host capacity registeredUsers")
+      .populate("host", "name -_id")
+      .populate("registeredUsers", "name -_id");
+
     return res.status(200).json(meetups);
   } catch (err) {
     console.error("getAllMeetups error:", err);
@@ -61,14 +63,29 @@ const searchMeetups = async (req, res) => {
         req.user?.userId || "anon"
       }`
     );
-    if (!keyword) return res.status(400).json({ error: "Keyword required" });
 
-    const meetups = await Meetup.find({
+    if (!keyword) {
+      return res.status(400).json({ error: "Keyword required" });
+    }
+
+    const meetupsRaw = await Meetup.find({
       $or: [
         { title: { $regex: keyword, $options: "i" } },
         { description: { $regex: keyword, $options: "i" } },
       ],
-    }).sort({ date: 1 });
+    })
+      .sort({ date: 1 })
+      .select("title date location description host capacity registeredUsers")
+      .populate("host", "name")
+      .populate("registeredUsers", "name")
+      .lean();
+
+    const meetups = meetupsRaw.map((m) => ({
+      ...m,
+      host: m.host?.name || null,
+      registeredUsers: m.registeredUsers.map((u) => u.name),
+    }));
+
     return res.status(200).json(meetups);
   } catch (err) {
     console.error("searchMeetups error:", err);
