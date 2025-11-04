@@ -213,9 +213,8 @@ const unregisterFromMeetup = async (req, res) => {
 const getMyMeetups = async (req, res) => {
   try {
     const userId = req.user?.id;
-
     if (!userId) {
-      return res.status(401).json({ error: "Ingen token." });
+      return res.status(401).json({ error: "Unauthorized" });
     }
 
     const meetupsRaw = await Meetup.find({
@@ -227,13 +226,23 @@ const getMyMeetups = async (req, res) => {
       .populate("registeredUsers", "name")
       .lean();
 
-    const meetups = meetupsRaw.map((m) => ({
+    const now = new Date();
+
+    const formatted = meetupsRaw.map((m) => ({
       ...m,
       host: m.host?.name || null,
       registeredUsers: m.registeredUsers.map((u) => u.name),
     }));
 
-    return res.status(200).json(meetups);
+    const upcomingMeetups = formatted.filter((m) => m.date >= now);
+    const pastMeetups = formatted
+      .filter((m) => m.date < now)
+      .sort((a, b) => b.date - a.date);
+
+    return res.status(200).json({
+      upcomingMeetups,
+      pastMeetups,
+    });
   } catch (err) {
     console.error("getMyMeetups error:", err);
     return res
