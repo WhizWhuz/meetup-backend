@@ -210,6 +210,38 @@ const unregisterFromMeetup = async (req, res) => {
   }
 };
 
+const getMyMeetups = async (req, res) => {
+  try {
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).json({ error: "Ingen token." });
+    }
+
+    const meetupsRaw = await Meetup.find({
+      registeredUsers: userId,
+    })
+      .sort({ date: 1 })
+      .select("title date location description host capacity registeredUsers")
+      .populate("host", "name")
+      .populate("registeredUsers", "name")
+      .lean();
+
+    const meetups = meetupsRaw.map((m) => ({
+      ...m,
+      host: m.host?.name || null,
+      registeredUsers: m.registeredUsers.map((u) => u.name),
+    }));
+
+    return res.status(200).json(meetups);
+  } catch (err) {
+    console.error("getMyMeetups error:", err);
+    return res
+      .status(500)
+      .json({ error: "Could not fetch meetups for this user" });
+  }
+};
+
 module.exports = {
   createMeetup,
   getAllMeetups,
@@ -217,4 +249,5 @@ module.exports = {
   getMeetupDetails,
   registerForMeetup,
   unregisterFromMeetup,
+  getMyMeetups,
 };

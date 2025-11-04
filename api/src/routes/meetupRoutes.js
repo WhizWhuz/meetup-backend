@@ -7,16 +7,18 @@ const {
   getMeetupDetails,
   registerForMeetup,
   unregisterFromMeetup,
+  getMyMeetups,
 } = require("../controllers/meetupController");
 const auth = require("../middlewares/authMiddleware");
 
 router.route("/").get(getAllMeetups).post(auth, createMeetup);
+
 router.get("/search", searchMeetups);
+
+router.get("/my-meetups", auth, getMyMeetups);
+router.post("/:meetupId/register", auth, registerForMeetup);
+router.delete("/:meetupId/unregister", auth, unregisterFromMeetup);
+
 router.get("/:meetupId", getMeetupDetails);
-
-router.use(auth);
-
-router.post("/:meetupId/register", registerForMeetup);
-router.delete("/:meetupId/unregister", unregisterFromMeetup);
 
 module.exports = router;
