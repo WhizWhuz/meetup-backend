@@ -77,7 +77,11 @@ exports.login = async (req, res) => {
     res.status(200).json({
       message: "Inloggning lyckades!",
       token,
-      user: { id: user._id, email: user.email },
+      user: {
+        id: user._id,
+        email: user.email,
+        name: user.name,
+      },
     });
   } catch (err) {
     res
@@ -88,7 +92,7 @@ exports.login = async (req, res) => {
 
 exports.getProfile = async (req, res) => {
   try {
-    const userId = req.user?.id
+    const userId = req.user?.id;
     if (!userId) {
       return res.status(401).json({ error: "Unauthorized" });
     }

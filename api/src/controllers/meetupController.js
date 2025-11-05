@@ -254,7 +254,7 @@ const getMyMeetups = async (req, res) => {
 module.exports = {
   createMeetup,
   getAllMeetups,
-  searchMeetups,
+  searchMeetups, 
   getMeetupDetails,
   registerForMeetup,
   unregisterFromMeetup,
