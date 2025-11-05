@@ -1,260 +1,209 @@
 const Meetup = require("../models/Meetup");
-const User = require("../models/User");
 
-const createMeetup = async (req, res) => {
-  try {
-    const { title, date, location, description, capacity } = req.body;
+//! Utils
 
-    if (!req.user?.id && !req.user?.userId) {
-      return res.status(401).json({ error: "Unauthorized" });
-    }
+const asyncHandler = require("../utils/http/asyncHandler");
+const requireAuth = require("../utils/http/requireAuth");
+const validateRequired = require("../utils/common/validateRequired");
+const { formatMeetups } = require("../utils/meetup/formatMeetup");
+const splitMeetupsByDate = require("../utils/meetup/splitMeetupsByDate");
+const findMeetupOr404 = require("../utils/meetup/findMeetupOr404");
+const { badRequest } = require("../utils/http/httpResponses");
 
-    if (!title || !date || !location || !description || !capacity) {
-      return res.status(400).json({ error: "Missing required fields" });
-    }
+//? Controllers
 
-    const hostId = req.user.id || req.user.userId;
+const createMeetup = asyncHandler(async (req, res) => {
+  const userId = requireAuth(req, res);
+  if (!userId) return;
 
-    const meetup = new Meetup({
-      title,
-      date,
-      location,
-      description,
-      host: hostId,
-      capacity: Number(capacity),
-      registeredUsers: [],
-    });
+  const { title, date, location, description, capacity } = req.body || {};
 
-    await meetup.save();
-    return res.status(201).json(meetup);
-  } catch (err) {
-    console.error("createMeetup error:", err);
-
-    if (err.name === "ValidationError" || err.name === "CastError") {
-      return res.status(400).json({ error: err.message });
-    }
-
-    return res.status(500).json({ error: "Could not create meetup" });
+  const missing = validateRequired(
+    ["title", "date", "location", "description", "capacity"],
+    req.body
+  );
+  if (missing.length > 0) {
+    return badRequest(res, `Följande fält saknas: ${missing.join(", ")}`);
   }
-};
 
-const getAllMeetups = async (req, res) => {
-  try {
-    console.log(`getAllMeetups request by user=${req.user?.userId || "anon"}`);
+  const meetup = await Meetup.create({
+    title,
+    date,
+    location,
+    description,
+    host: userId,
+    capacity: Number(capacity),
+    registeredUsers: [],
+  });
 
-    const meetups = await Meetup.find()
-      .sort({ date: 1 })
-      .select("title date location description host capacity registeredUsers")
-      .populate("host", "name -_id")
-      .populate("registeredUsers", "name -_id");
+  return res.status(201).json(meetup);
+});
 
-    return res.status(200).json(meetups);
-  } catch (err) {
-    console.error("getAllMeetups error:", err);
-    return res.status(500).json({ error: "Could not fetch meetups" });
+const getAllMeetups = asyncHandler(async (req, res) => {
+  console.log(
+    `getAllMeetups request by user=${
+      req.user?.id || req.user?.userId || "anon"
+    }`
+  );
+
+  const meetups = await Meetup.find()
+    .sort({ date: 1 })
+    .select("title date location description host capacity registeredUsers")
+    .populate("host", "name -_id")
+    .populate("registeredUsers", "name -_id");
+
+  return res.status(200).json(meetups);
+});
+
+const searchMeetups = asyncHandler(async (req, res) => {
+  const { keyword } = req.query || {};
+  console.log(
+    `searchMeetups keyword=${keyword || "(none)"} user=${
+      req.user?.id || req.user?.userId || "anon"
+    }`
+  );
+
+  if (!keyword) {
+    return badRequest(res, "Nyckelord behövs.");
   }
-};
 
-const searchMeetups = async (req, res) => {
-  try {
-    const { keyword } = req.query;
-    console.log(
-      `searchMeetups keyword=${keyword || "(none)"} user=${
-        req.user?.userId || "anon"
-      }`
-    );
+  const meetupsRaw = await Meetup.find({
+    $or: [
+      { title: { $regex: keyword, $options: "i" } },
+      { description: { $regex: keyword, $options: "i" } },
+    ],
+  })
+    .sort({ date: 1 })
+    .select("title date location description host capacity registeredUsers")
+    .populate("host", "name")
+    .populate("registeredUsers", "name")
+    .lean();
 
-    if (!keyword) {
-      return res.status(400).json({ error: "Keyword required" });
-    }
+  const meetups = formatMeetups(meetupsRaw);
+  return res.status(200).json(meetups);
+});
 
-    const meetupsRaw = await Meetup.find({
-      $or: [
-        { title: { $regex: keyword, $options: "i" } },
-        { description: { $regex: keyword, $options: "i" } },
-      ],
-    })
-      .sort({ date: 1 })
-      .select("title date location description host capacity registeredUsers")
-      .populate("host", "name")
-      .populate("registeredUsers", "name")
-      .lean();
+const getMeetupDetails = asyncHandler(async (req, res) => {
+  const { meetupId } = req.params;
+  console.log(
+    `........getMeetupDetails: id=${meetupId} requested by user=${
+      req.user?.id || req.user?.userId || "anon"
+    }`
+  );
 
-    const meetups = meetupsRaw.map((m) => ({
-      ...m,
-      host: m.host?.name || null,
-      registeredUsers: m.registeredUsers.map((u) => u.name),
-    }));
+  const meetup = await Meetup.findById(meetupId)
+    .populate("host", "name email")
+    .populate("registeredUsers", "name email")
+    .lean();
 
-    return res.status(200).json(meetups);
-  } catch (err) {
-    console.error("searchMeetups error:", err);
-    return res.status(500).json({ error: "Search failed" });
+  if (!meetup) {
+    return res.status(404).json({ error: "Meetupen hittades inte." });
   }
-};
 
-const getMeetupDetails = async (req, res) => {
-  try {
-    const { meetupId } = req.params;
-    console.log(
-      `........getMeetupDetails: id=${meetupId} requested by user=${
-        req.user?.userId || "anon"
-      }`
-    );
+  return res.status(200).json({
+    _id: meetup._id,
+    title: meetup.title,
+    date: meetup.date,
+    location: meetup.location,
+    description: meetup.description,
+    host: {
+      name: meetup.host?.name || null,
+      email: meetup.host?.email || null,
+    },
+    capacity: meetup.capacity,
+    registeredCount: (meetup.registeredUsers || []).length,
+    registeredUsers: meetup.registeredUsers || [],
+  });
+});
 
-    const meetup = await Meetup.findById(meetupId);
-    if (!meetup) return res.status(404).json({ error: "Meetup not found" });
+const registerForMeetup = asyncHandler(async (req, res) => {
+  const userId = requireAuth(req, res);
+  console.log(
+    `registerForMeetup meetupId=${req.params.meetupId} user=${userId || "anon"}`
+  );
+  if (!userId) return;
 
-    const host = meetup.host ? await User.findById(meetup.host) : null;
+  const meetup = await findMeetupOr404(req.params.meetupId, res);
+  if (!meetup) return;
 
-    const registeredUsers =
-      meetup.registeredUsers && meetup.registeredUsers.length > 0
-        ? await User.find(
-            { _id: { $in: meetup.registeredUsers } },
-            "name email"
-          )
-        : [];
-
-    console.log(
-      `getMeetupDetails: meetup=${meetupId} host=${
-        host?._id || "unknown"
-      } registered=${registeredUsers.length}`
-    );
-
-    return res.status(200).json({
-      _id: meetup._id,
-      title: meetup.title,
-      date: meetup.date,
-      location: meetup.location,
-      description: meetup.description,
-      host: {
-        name: host?.name || null,
-        email: host?.email || null,
-      },
-      capacity: meetup.capacity,
-      registeredCount: meetup.registeredUsers.length,
-      registeredUsers,
-    });
-  } catch (error) {
-    console.error("getMeetupDetails error:", error);
-    return res.status(500).json({ error: "Error fetching meetup details" });
+  const alreadyRegistered = meetup.registeredUsers.some(
+    (u) => u.toString() === userId
+  );
+  if (alreadyRegistered) {
+    return badRequest(res, "Du är redan registrerad till Meetup.");
   }
-};
 
-const registerForMeetup = async (req, res) => {
-  try {
-    console.log(
-      `registerForMeetup meetupId=${req.params.meetupId} user=${
-        req.user?.userId || "anon"
-      }`
-    );
-    const meetup = await Meetup.findById(req.params.meetupId);
-    if (!meetup) return res.status(404).json({ error: "Meetup not found." });
-
-    const userId = req.user?.userId;
-    if (!userId) return res.status(401).json({ error: "Unauthorized." });
-
-    if (meetup.registeredUsers.includes(userId)) {
-      return res
-        .status(400)
-        .json({ error: "You are already registered to meeting." });
-    }
-
-    if (meetup.registeredUsers.length >= meetup.capacity) {
-      return res.status(400).json({ error: "Meetup is full" });
-    }
-
-    meetup.registeredUsers.push(userId);
-    await meetup.save();
-    return res.status(200).json({
-      message: "Registered",
-      title: meetup.title,
-      date: meetup.date,
-      location: meetup.location,
-      description: meetup.description,
-    });
-  } catch (err) {
-    console.error("registerForMeetup error:", err);
-    return res.status(500).json({ error: "Registration failed" });
+  if (meetup.registeredUsers.length >= meetup.capacity) {
+    return badRequest(res, "Meetupen är full.");
   }
-};
 
-const unregisterFromMeetup = async (req, res) => {
-  try {
-    console.log(
-      `unregisterFromMeetup meetupId=${req.params.meetupId} requestedBy=${
-        req.user?.userId || "anon"
-      }`
-    );
-    const meetup = await Meetup.findById(req.params.meetupId);
-    if (!meetup) return res.status(404).json({ error: "Meetup not found" });
+  meetup.registeredUsers.push(userId);
+  await meetup.save();
 
-    const userId = req.user?.userId;
-    if (!userId) return res.status(401).json({ error: "Unauthorized" });
+  return res.status(200).json({
+    message: "Registrerad.",
+    title: meetup.title,
+    date: meetup.date,
+    location: meetup.location,
+    description: meetup.description,
+  });
+});
 
-    const idx = meetup.registeredUsers.indexOf(userId);
-    if (idx === -1) return res.status(400).json({ error: "Not registered" });
+const unregisterFromMeetup = asyncHandler(async (req, res) => {
+  const userId = requireAuth(req, res);
+  console.log(
+    `unregisterFromMeetup meetupId=${req.params.meetupId} requestedBy=${
+      userId || "anon"
+    }`
+  );
+  if (!userId) return;
 
-    meetup.registeredUsers.splice(idx, 1);
-    await meetup.save();
-    return res.status(200).json({
-      message: "Unregistered",
-      title: meetup.title,
-      date: meetup.date,
-      location: meetup.location,
-      description: meetup.description,
-    });
-  } catch (err) {
-    console.error("unregisterFromMeetup error:", err);
-    return res.status(500).json({ error: "Unregistration failed" });
+  const meetup = await findMeetupOr404(req.params.meetupId, res);
+  if (!meetup) return;
+
+  const idx = meetup.registeredUsers.findIndex((u) => u.toString() === userId);
+  if (idx === -1) {
+    return badRequest(res, "Inte registrerad.");
   }
-};
 
-const getMyMeetups = async (req, res) => {
-  try {
-    const userId = req.user?.id;
-    if (!userId) {
-      return res.status(401).json({ error: "Unauthorized" });
-    }
+  meetup.registeredUsers.splice(idx, 1);
+  await meetup.save();
 
-    const meetupsRaw = await Meetup.find({
-      registeredUsers: userId,
-    })
-      .sort({ date: 1 })
-      .select("title date location description host capacity registeredUsers")
-      .populate("host", "name")
-      .populate("registeredUsers", "name")
-      .lean();
+  return res.status(200).json({
+    message: "Avregisterad.",
+    title: meetup.title,
+    date: meetup.date,
+    location: meetup.location,
+    description: meetup.description,
+  });
+});
 
-    const now = new Date();
+const getMyMeetups = asyncHandler(async (req, res) => {
+  const userId = requireAuth(req, res);
+  if (!userId) return;
 
-    const formatted = meetupsRaw.map((m) => ({
-      ...m,
-      host: m.host?.name || null,
-      registeredUsers: m.registeredUsers.map((u) => u.name),
-    }));
+  const meetupsRaw = await Meetup.find({
+    registeredUsers: userId,
+  })
+    .sort({ date: 1 })
+    .select("title date location description host capacity registeredUsers")
+    .populate("host", "name")
+    .populate("registeredUsers", "name")
+    .lean();
 
-    const upcomingMeetups = formatted.filter((m) => m.date >= now);
-    const pastMeetups = formatted
-      .filter((m) => m.date < now)
-      .sort((a, b) => b.date - a.date);
+  const formatted = formatMeetups(meetupsRaw);
+  const { upcomingMeetups, pastMeetups } = splitMeetupsByDate(formatted);
 
-    return res.status(200).json({
-      upcomingMeetups,
-      pastMeetups,
-    });
-  } catch (err) {
-    console.error("getMyMeetups error:", err);
-    return res
-      .status(500)
-      .json({ error: "Could not fetch meetups for this user" });
-  }
-};
+  return res.status(200).json({
+    upcomingMeetups,
+    pastMeetups,
+  });
+});
 
 module.exports = {
   createMeetup,
   getAllMeetups,
-  searchMeetups, 
+  searchMeetups,
   getMeetupDetails,
   registerForMeetup,
   unregisterFromMeetup,
