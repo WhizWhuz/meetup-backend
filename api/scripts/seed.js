@@ -1,4 +1,4 @@
-// scripts/seed.js
+// Initiate
 
 const path = require("path");
 
@@ -7,7 +7,6 @@ require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 
-// Anpassa paths om dina modeller ligger annorlunda
 const User = require("../src/models/User");
 const Meetup = require("../src/models/Meetup");
 
@@ -21,11 +20,11 @@ async function main() {
   await mongoose.connect(MONGO);
   console.log("✅ Connected to MongoDB");
 
-  // Rensa gamla seeds (valfritt – kommentera om du vill spara befintligt)
   await Promise.all([User.deleteMany({}), Meetup.deleteMany({})]);
   console.log("🧹 Cleared collections");
 
-  // 5 st hosts
+  // Data
+
   const rawUsers = [
     { name: "Alice Andersson", email: "alice@example.com" },
     { name: "Bob Berg", email: "bob@example.com" },
@@ -40,10 +39,8 @@ async function main() {
   );
   console.log(`👤 Inserted ${users.length} users`);
 
-  // Hjälpare
   const pickHost = (i) => users[i % users.length]._id;
   const someAttendees = (hostId) => {
-    // 0–3 slumpade attendees (ej host)
     const pool = users
       .map((u) => String(u._id))
       .filter((id) => id !== String(hostId));
@@ -221,7 +218,6 @@ async function main() {
     },
   ];
 
-  // Koppla host + några registrerade användare
   const docs = meetups.map((m, i) => {
     const host = pickHost(i);
     return {
