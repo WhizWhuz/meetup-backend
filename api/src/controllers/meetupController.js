@@ -40,11 +40,7 @@ const createMeetup = asyncHandler(async (req, res) => {
 });
 
 const getAllMeetups = asyncHandler(async (req, res) => {
-  console.log(
-    `getAllMeetups request by user=${
-      req.user?.id || req.user?.userId || "anon"
-    }`
-  );
+  console.log(`getAllMeetups request by user=${req.user?.name}`);
 
   const meetups = await Meetup.find()
     .sort({ date: 1 })
@@ -58,9 +54,7 @@ const getAllMeetups = asyncHandler(async (req, res) => {
 const searchMeetups = asyncHandler(async (req, res) => {
   const { keyword } = req.query || {};
   console.log(
-    `searchMeetups keyword=${keyword || "(none)"} user=${
-      req.user?.id || req.user?.userId || "anon"
-    }`
+    `searchMeetups keyword=${keyword || "(none)"} user=${req.user?.id}`
   );
 
   if (!keyword) {
@@ -86,9 +80,7 @@ const searchMeetups = asyncHandler(async (req, res) => {
 const getMeetupDetails = asyncHandler(async (req, res) => {
   const { meetupId } = req.params;
   console.log(
-    `........getMeetupDetails: id=${meetupId} requested by user=${
-      req.user?.id || req.user?.userId || "anon"
-    }`
+    `........getMeetupDetails: id=${meetupId} requested by user=${req.user?.id}`
   );
 
   const meetup = await Meetup.findById(meetupId)
@@ -119,7 +111,7 @@ const getMeetupDetails = asyncHandler(async (req, res) => {
 const registerForMeetup = asyncHandler(async (req, res) => {
   const userId = requireAuth(req, res);
   console.log(
-    `registerForMeetup meetupId=${req.params.meetupId} user=${userId || "anon"}`
+    `registerForMeetup meetupId=${req.params.meetupId} user=${userId}`
   );
   if (!userId) return;
 
@@ -152,9 +144,7 @@ const registerForMeetup = asyncHandler(async (req, res) => {
 const unregisterFromMeetup = asyncHandler(async (req, res) => {
   const userId = requireAuth(req, res);
   console.log(
-    `unregisterFromMeetup meetupId=${req.params.meetupId} requestedBy=${
-      userId || "anon"
-    }`
+    `unregisterFromMeetup meetupId=${req.params.meetupId} requestedBy=${userId}`
   );
   if (!userId) return;
 

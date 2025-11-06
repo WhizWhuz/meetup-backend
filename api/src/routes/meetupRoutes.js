@@ -11,7 +11,7 @@ const {
 } = require("../controllers/meetupController");
 const auth = require("../middlewares/authMiddleware");
 
-router.route("/").get(getAllMeetups).post(auth, createMeetup);
+router.route("/").get(auth, getAllMeetups).post(auth, createMeetup);
 
 router.get("/search", searchMeetups);
 
