@@ -11,11 +11,11 @@ const {
 } = require("../controllers/meetupController");
 const auth = require("../middlewares/authMiddleware");
 
-router.route("/").get(auth, getAllMeetups).post(auth, createMeetup);
+router.route("/").get(getAllMeetups).post(auth, createMeetup);
 
 router.get("/search", searchMeetups);
 
-router.get("/my-meetups", getMyMeetups);
+router.get("/my-meetups", auth, getMyMeetups);
 router.post("/:meetupId/register", auth, registerForMeetup);
 router.delete("/:meetupId/unregister", auth, unregisterFromMeetup);
 
