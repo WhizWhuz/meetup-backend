@@ -1,5 +1,7 @@
 # Länk till vårat [Frontend Repo](https://github.com/kelsaur/meetup-frontend)
 
+# [📼 Video Presentation 📼](https://www.youtube.com/watch?v=bJwsDJjZKCg)
+
 # Base URL
 
 ```javascript
