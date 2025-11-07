@@ -15,7 +15,7 @@ router.route("/").get(auth, getAllMeetups).post(auth, createMeetup);
 
 router.get("/search", searchMeetups);
 
-router.get("/my-meetups", auth, getMyMeetups);
+router.get("/my-meetups", getMyMeetups);
 router.post("/:meetupId/register", auth, registerForMeetup);
 router.delete("/:meetupId/unregister", auth, unregisterFromMeetup);
 
